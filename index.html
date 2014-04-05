@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang='es'>
+    <head>
+        <title> Pablo Parejo - Puzzle</title>
+        <meta charset="utf-8">
+    </head>
+    <style>
+        
+        body{
+            margin: 0;
+            font-family: helvetica;
+        }
+        #slider img{
+            width: 100%;
+        }
+        
+        p{
+            font-size: 30px;
+            font-weight: lighter;
+            margin-top: 10px;
+        }
+        
+        img{
+            display: inline-block;
+        }
+        
+        #content{
+            width: 74%;
+            margin: 0 auto;
+        }
+        
+        #containerPuzzle .row div{
+            display: inline-block;
+            width: 32%;
+        }
+        
+        #containerPuzzle .row img{
+            width: 100%;
+        }
+        
+        #containerPuzzle{
+            width: 100%;
+            max-width: 520px;
+            min-width: 240px;
+            margin: 0px auto;
+        }
+        
+        #puzzle{
+            width: 90%;
+            margin: 0 auto;
+            display: block;
+            padding-top: 30px;
+        }
+
+        #puzzle img{
+            margin: 0px;
+        }
+        
+        .widget{
+            width: 15%;
+            margin: 10px;
+            display: inline-block;
+            vertical-align: top;
+            text-align: center;
+            background: rgba(44, 154, 183, 0.3);
+            border-radius: 10px;
+            box-shadow: 0px 2px 3px 0px #CCC;
+            border: 1px solid white;
+        }
+        
+        .widget h3{
+            background: #E74;
+            margin: 0;
+            padding: 10px;
+            border-radius: 10px 10px 0px 0px;
+            border-bottom: 1px solid white;
+        }
+        
+        
+        .widget p{
+            display: inline-block;
+            margin: 20px;
+        }
+        
+        .row {
+            width: 100%;
+            display: inline-block;
+        }
+        
+        #sliderContainer {
+            background: #EEE;
+            margin-bottom: 20px;
+        }
+        
+        #slider {
+            width: 30%;
+            margin: 0 auto;
+            min-width: 200px;
+        }
+        
+        #slider img{
+            display: inline-block;
+            width: 32%;
+            margin-top: 3px; 
+        }
+        
+        #time{
+            float: right;
+        }
+        
+        #record{
+            float: left;
+        }
+        
+        @media (max-width: 1275px){
+            #puzzle{
+                width: 60%;
+            }
+            
+            h3{
+                font-size: 16px;
+            }
+            
+            p{
+                font-size: 26px;
+            }
+        }
+        @media (max-width: 700px){
+            #content{
+                width: 100%;
+                margin: 0px;
+            }
+            
+            h3{
+                font-size: 14px;
+            }
+            
+            p{
+                font-size: 13px;
+            }
+            
+            #puzzle{
+                width:80%;
+            }
+            #time, #record{
+                width: 40%;
+            }
+        }
+    </style>
+    <script>
+        var fade_velocity = 1;
+        var i = 0;
+        var opacity = 1;
+        var images = ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg", "img6.jpg"]
+        
+        function hide() {
+            opacity -= 0.03;
+            document.getElementById("slider").style.opacity = opacity;
+            if (opacity > 0) {
+                setTimeout(function(){hide()},7);
+            }else{
+                opacity = 0;
+            }
+        }
+        
+        function show() {
+            opacity += 0.03;
+            document.getElementById("slider").style.opacity = opacity;
+            if (opacity < 1) {
+                setTimeout(function(){show()},7);
+            }else{
+                opacity = 1;
+            }
+        }
+        
+        function change_imgs() {
+            document.getElementById("imagen1").src = "puzzle/" + images[i];
+            if (i<=3) {
+                document.getElementById("imagen2").src = "puzzle/" + images[i + 1];
+                document.getElementById("imagen3").src = "puzzle/" + images[i + 2];
+            }else if (i == 4) {
+                document.getElementById("imagen2").src = "puzzle/" + images[i + 1];
+                document.getElementById("imagen3").src = "puzzle/" + images[0];
+            }else{
+                document.getElementById("imagen2").src = "puzzle/" + images[0];
+                document.getElementById("imagen3").src = "puzzle/" + images[1];
+                i = -1;
+            }
+        }
+        
+        function slide() {
+            
+            hide();
+            
+            setTimeout(function(){change_imgs()}, 700);
+            
+            setTimeout(function(){show()},900);
+            
+            i += 1;
+        }
+        
+        function switchImg(blanco, pieza) {
+            blanco.src = pieza.children[0].src;
+            blanco.id = pieza.children[0].id;
+            pieza.children[0].id = "blanco";
+            pieza.children[0].src = "";
+        }
+        
+        function comprobarPuzzle() {
+            var puzzle = document.getElementById("puzzle");
+            var row;
+            var success = true;
+            for (var i = 0; i <= 2; i++){
+                row = puzzle.children[i];
+                for (var casilla = 0; casilla <= 2; casilla++){
+                    if ("pieza" + row.children[casilla].id != row.children[casilla].children[0].id){
+                        if (row.children[casilla].id == 9 &&
+                            row.children[casilla].children[0].id == "blanco") {
+                            success = true;
+                        }else{
+                            success = false;
+                        }
+                        return success;
+                    }
+                }
+            }
+            return success;
+        }
+        
+        function move(pieza) {
+            
+            var blanco = document.getElementById("blanco");
+            var puzzleCompletado = false;
+            
+            if (pieza.id == 4 || pieza.id == 7) {
+                if (blanco.parentNode.id == parseInt(pieza.id) + 1 ||
+                    blanco.parentNode.id == parseInt(pieza.id) - 3 ||
+                    blanco.parentNode.id == parseInt(pieza.id) + 3 ) {
+                    switchImg(blanco, pieza);
+                    puzzleCompletado = comprobarPuzzle();
+                }
+            }else if (pieza.id == 3 || pieza.id == 6) {
+                if (blanco.parentNode.id == parseInt(pieza.id) - 1 ||
+                    blanco.parentNode.id == parseInt(pieza.id) - 3 ||
+                    blanco.parentNode.id == parseInt(pieza.id) + 3 ) {
+                    switchImg(blanco, pieza);
+                    puzzleCompletado = comprobarPuzzle();
+                }
+            }else{            
+                if (blanco.parentNode.id == parseInt(pieza.id) + 1 ||
+                    blanco.parentNode.id == parseInt(pieza.id) - 1 ||
+                    blanco.parentNode.id == parseInt(pieza.id) + 3 ||
+                    blanco.parentNode.id == parseInt(pieza.id) - 3){
+                    
+                    switchImg(blanco, pieza);
+                    puzzleCompletado = comprobarPuzzle();
+                }
+            }
+            
+            if (puzzleCompletado) {
+                var newRecord = isRecord();
+                if (newRecord) {
+                    setTimeout(function(){alert("¡Bien! Has superado el record")}, 20);
+                    stop_clock();
+                }else{
+                    setTimeout(function(){alert("¡Bien! Has completado el puzzle")}, 20);
+                }
+                
+            }
+        }
+        
+        
+        function isRecord() {
+            var currentRecord = getCookie("record");
+            console.log(currentRecord);
+            var newTime = (min * 60) + seg;
+            if (newTime < currentRecord || currentRecord == "") {
+                setCookie("record", newTime, 50);
+                return true;
+            }
+            return false;
+        }
+        
+        var casillasPuzzle = ["-0-0.jpg", "-1-0.jpg", "-2-0.jpg", "-0-1.jpg", "-1-1.jpg", "-2-1.jpg", "-0-2.jpg", "-1-2.jpg", ""];
+        
+        function aleatorio(numeros_usados) {
+            var min = 1;
+            var max = 9;
+            var num = Math.floor(Math.random() * (max - min + 1)) + min;
+            for (var i in numeros_usados) {
+                if (num == numeros_usados[i]) {
+                    num = aleatorio(numeros_usados);
+                }
+            }
+            numeros_usados[numeros_usados.length] = num;
+            return num;
+        }
+        
+        function change_puzzle(image) {
+            image = image.split(".")[0];
+            var piezas_usadas = [];
+            var puzzle = document.getElementById("puzzle");
+            var row;
+            for (var i = 0; i <= 2; i++){
+                row = puzzle.children[i];
+                for (var casilla = 0; casilla <= 2; casilla++){
+                    var numero = aleatorio(piezas_usadas);
+                    if (numero == 9) {
+                        row.children[casilla].children[0].id = "blanco";
+                        row.children[casilla].children[0].src = "white.png";
+                    }else{
+                        row.children[casilla].children[0].id = "pieza" + numero;
+                        row.children[casilla].children[0].src = image + casillasPuzzle[numero-1];
+                    }
+                }
+            }
+            start_clock();
+        }
+        
+        
+        var min;
+        var seg;
+        var clock;
+        
+        function time() {
+            var seg_formated;
+            var min_formated;
+            seg++;
+            if (seg == 60) {
+                seg = 0;
+                min++;
+            }
+            if (seg < 10) {
+                seg_formated = "0" + seg;
+            }else{
+                seg_formated = seg;
+            }
+            
+            if (min < 10) {
+                min_formated = "0" + min;
+            }else{
+                min_formated = min;
+            }
+            document.getElementById("timer").innerHTML = min_formated + ":" + seg_formated;
+        }
+        
+        function stop_clock() {
+            seg = 0;
+            min = 0;
+            document.getElementById("timer").innerHTML = "0" + min + ":" + "0" + seg;
+        }
+        
+        function start_clock() {
+            clearInterval(clock);
+            stop_clock();
+            clock = setInterval(function(){time()}, 1000);
+        }
+        
+        function setCookie(cname,cvalue,exdays){
+            var d = new Date();
+            d.setTime(d.getTime()+(exdays*24*60*60*1000));
+            var expires = "expires="+d.toGMTString();
+            document.cookie = cname+"="+cvalue+"; "+expires;
+        }
+        
+        function getCookie(cname){
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0; i<ca.length; i++){
+                var c = ca[i].trim();
+                if (c.indexOf(name)==0){
+                    return c.substring(name.length,c.length);
+                }
+            }
+                return "";
+        }
+        
+        function addUser(user){
+            var users = getCookie("users");
+            users += "," + user;
+            setCookie("users", users, 100);
+            console.log(users);
+        }
+        
+        function userRegistered(user){
+            var users = getCookie("users").split(",")
+            for (var i=0; i<users.length; i++){
+                if (user == users[i]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        var username;
+        
+        function registration(){
+            username = prompt("Enter username:", "");
+            if (userRegistered(username)) {
+                alert('Hola de nuevo ' + username);
+            }else{
+                addUser(username);
+                alert('Bienvenido ' + username);
+            }
+        }
+        
+        function getRecord(){
+            var newTime = (min * 60) + seg;
+            var record = getCookie("record");
+            var record_min = Math.floor(record/60);
+            console.log(record_min);
+            var record_seg = record - (record_min * 60);
+            if (record_min < 10) {
+                record_min = "0" + record_min;
+            }
+            if (record_seg < 10) {
+                record_seg = "0" + record_seg;
+            }
+            document.getElementById("recordTime").innerHTML = record_min + ":" + record_seg;
+        }
+        
+        
+        registration();
+        setInterval(function(){slide()},6000);
+        
+        console.log(document.cookie);
+        
+    </script>
+    <body onload="getRecord()">
+        <div id="sliderContainer">
+            <div id="slider">
+                <img onclick="change_puzzle(this.src)" id="imagen1" src="puzzle/img1.jpg" />
+                <img onclick="change_puzzle(this.src)" id="imagen2" src="puzzle/img2.jpg" />
+                <img onclick="change_puzzle(this.src)" id="imagen3" src="puzzle/img3.jpg" />
+            </div>
+        </div>
+        <div id="contentContainer">
+            <div id="content">
+                <div id="record" class="widget">
+                    <h3>Record</h3>
+                    <p id="recordTime">00:00</p>
+                </div>
+                <div id="time" class="widget">
+                    <h3>Tiempo</h3>
+                    <p id="timer">00:00</p>
+                </div>
+                <div id="containerPuzzle">
+                    <div id="puzzle">
+                        <div id=row1 class="row">
+                            <div id="1" onclick="move(this)">
+                                <img id="pieza1" src="white.png" />
+                            </div>
+                            <div id="2" onclick="move(this)">
+                                <img id="pieza2" src="white.png" />
+                            </div>
+                            <div id="3" onclick="move(this)">
+                                <img id="pieza3" src="white.png" />
+                            </div>
+                        </div>
+                        <div id="row2" class="row">
+                            <div id="4" onclick="move(this)">
+                                <img id="pieza4" src="white.png" />
+                            </div>
+                            <div id="5" onclick="move(this)">
+                                <img id="pieza5" src="white.png" />
+                            </div>
+                            <div id="6" onclick="move(this)">
+                                <img id="pieza6" src="white.png" />
+                            </div>
+                        </div>
+                        <div id="row3" class="row">
+                            <div id="7" onclick="move(this)">
+                                <img id="pieza7" src="white.png" />
+                            </div>
+                            <div id="8" onclick="move(this)">
+                                <img id="blanco" src="white.png" />
+                            </div>
+                            <div id="9" onclick="move(this)">
+                                <img id="pieza8" src="white.png" />
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

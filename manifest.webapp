@@ -1,0 +1,16 @@
+{
+	"verion": "0.1",
+	"name": "puzzle",
+	"description": "Hello World",
+	"launch_pad": "/index.html",
+	"developer": {
+		"name": "Parex",
+		"url": "camitexas.com"
+	},
+	"installs_allowed_from": ["*"],
+	"default_locale": "es",
+	"icons":{
+		"16": "icon16.png",
+		"128": "icon128.png"
+	} 
+}
